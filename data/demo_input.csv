@@ -1,0 +1,5 @@
+case,Type,Air temperature [K],Process temperature [K],Rotational speed [rpm],Torque [Nm],Tool wear [min],Machine failure
+healthy,M,298.1,308.6,1551,42.8,0,0
+HDF,M,300.8,309.4,1342,62.4,113,1
+PWF,L,298.9,309.1,2861,4.6,143,1
+OSF,L,298.9,309.0,1410,65.7,191,1
