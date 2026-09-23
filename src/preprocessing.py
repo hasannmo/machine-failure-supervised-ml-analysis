@@ -46,12 +46,6 @@ def load_raw(csv_path: str) -> pd.DataFrame:
 
 
 def split_inputs_target_modes(df: pd.DataFrame):
-    """
-    Split a raw dataframe into:
-      X       - model inputs only (numeric + categorical features, NO ids, NO mode flags)
-      y       - the target, Machine failure (0/1)
-      modes   - the five failure-mode flags, for analysis only (never fed to a model)
-    """
     X = df[NUMERIC_COLS + CATEGORICAL_COLS].copy()
     y = df[TARGET_COL].copy()
     modes = df[FAILURE_MODE_COLS].copy()
@@ -60,11 +54,6 @@ def split_inputs_target_modes(df: pd.DataFrame):
 
 def make_train_test_split(X: pd.DataFrame, y: pd.Series, modes: pd.DataFrame,
                            test_size: float = 0.2, random_state: int = 42):
-    """
-    One stratified split shared by every scenario (A/B/C) and every model,
-    so results across scenarios/models are comparable. `modes` is split with
-    the same indices so failure-mode analysis lines up with the test set.
-    """
     idx_train, idx_test = train_test_split(
         X.index, test_size=test_size, random_state=random_state, stratify=y
     )
@@ -76,20 +65,6 @@ def make_train_test_split(X: pd.DataFrame, y: pd.Series, modes: pd.DataFrame,
 
 
 def make_base_column_transformer(scale_numeric: bool) -> ColumnTransformer:
-    """
-    Base preprocessing: one-hot encode Type; optionally scale numeric columns.
-    scale_numeric=True for Logistic Regression and KNN.
-    scale_numeric=False for Decision Tree (scaling doesn't matter for trees,
-    and leaving raw values makes the tree's learned thresholds directly
-    comparable to the true physical thresholds in error analysis).
-
-    NOTE: for scenarios B and C, the numeric feature list changes (extra
-    engineered columns). Build the transformer AFTER adding those columns —
-    see notebooks/02_features.ipynb — passing the updated numeric column list
-    via the `numeric_cols` argument on FeatureAdderX transformers, or by
-    constructing a fresh ColumnTransformer with the new numeric column names.
-    This function covers Scenario A (raw features) directly.
-    """
     numeric_step = StandardScaler() if scale_numeric else "passthrough"
     return ColumnTransformer(
         transformers=[
